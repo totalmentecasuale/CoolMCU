@@ -15,10 +15,8 @@
 #include <ir_Panasonic.h>
 
 // Network variables
-const char* ssid = "belìn è la rrrete"; //Your Network SSID
-//const char* ssid = "wifimcu"; //Your Network SSID
-const char* password = "11235813213455"; //Your Network Password
-//const char* password = "zoccazocca"; //Your Network Password
+const char* ssid = "foofoo"; //Your Network SSID
+const char* password = "barbar"; //Your Network Password
 
 const char* mqtt_server = "test.mosquitto.org";
 
@@ -43,7 +41,7 @@ char ACmsg[100];
 // Thingspeak channel setup
 unsigned long myChannelNumber = 1092202; //Your Channel Number (Without Brackets)
 
-const char * myWriteAPIKey = "WRVX1WEF8WHP5M1W"; //Your Write API Key
+const char * myWriteAPIKey = "foobar"; //Your Write API Key
 
 bool manual_or = false;
 bool state_changed = false;
@@ -59,6 +57,17 @@ void OnAC(){
 void OffAC(){
   ac.off();
   ac.send();
+  }
+
+void resetAC(){
+  Serial.println("Setting default state for A/C.");
+  ac.on();
+  ac.setFan(kPanasonicAcFanAuto);
+  ac.setMode(kPanasonicAcDry);
+  ac.setTemp(23);
+  ac.setSwingVertical(kPanasonicAcSwingVAuto);
+  ac.setSwingHorizontal(kPanasonicAcSwingHAuto);
+  ac.setPowerful(false);
   }
 
 // Called when a message is received, currently testing
@@ -146,12 +155,13 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("announcements", "hello world");
+      client.publish("announcements", "Connected, let's chill");
       // ... and resubscribe
       client.subscribe("room/AC/toggle");
       client.subscribe("room/AC/set_temp");
       client.subscribe("room/AC/set_powerful");
       client.subscribe("room/AC/set_mode");
+      client.subscribe("room/AC/reset_AC");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -167,24 +177,8 @@ void printState() {
   Serial.println("Panasonic A/C remote is in the following state:");
   Serial.printf("  %s\n", ac.toString().c_str());
   snprintf(ACmsg, 100, "AC State: %s\n", ac.toString().c_str());
-//  // Display the encoded IR sequence.
-//  unsigned char* ir_code = ac.getRaw();
-//  Serial.print("IR Code: 0x");
-//  for (uint8_t i = 0; i < kPanasonicAcStateLength; i++)
-//    Serial.printf("%02X", ir_code[i]);
   Serial.println();
 }
-
-void resetAC(){
-  Serial.println("Setting default state for A/C.");
-  ac.on();
-  ac.setFan(kPanasonicAcFanAuto);
-  ac.setMode(kPanasonicAcDry);
-  ac.setTemp(23);
-  ac.setSwingVertical(kPanasonicAcSwingVAuto);
-  ac.setSwingHorizontal(kPanasonicAcSwingHAuto);
-  ac.setPowerful(false);
-  }
 
 //-----------------------------------------------
 void setup()
