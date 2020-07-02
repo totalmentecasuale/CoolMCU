@@ -1,6 +1,9 @@
 # CoolMCU
 Personal project for the Internet of Things course @ Politecnico di Milano, A.Y 2019/2020
 
+## [Small demo video](https://youtu.be/NQHO01V8qtM)
+## [ThingSpeak Channel](https://thingspeak.com/channels/1092202)
+
 ## Project concept
 
 Use a ESP8266 WiFi board to:
@@ -35,6 +38,8 @@ The board was put on a breadboard together with the DHT11 sensor and the IR LED 
 The IR LED was connected to D2 (Pin 4) through a transistor, in order to guarantee an adequate current flow to power it.
 The DHT11 sensor was connected to D4 (Pin 2) directly.
 
+![](report/board.jpg)
+
 ## Sketch
 
 ### setup()
@@ -52,7 +57,7 @@ All the services are initialised:
 It repeats every 3 seconds.
 * Temperature and humidity are read and printed to serial port at the beginning of each cycle
 * The node checks if the temperature is above 24 and turns the AC on using the dedicated function. There is a manual override boolean in order to allow me to turn it on or off remotely.
-* If any message from the control topics has arrived the node sends the command to the AC unit via the IR LED.
+* If any message from the control topics has arrived the node sends the command to the AC unit via the IR LED (via the boolean `state_changedyhhht122`).
 * If 2s have passed from the last MQTT messages published, a new one for each value is crafted and published to the channels `/room/temp` and `room/hum` respectively.
 * If 30s have passed from the last Thingspeak message (to avoid getting them rejected for being too frequent) another one is sent to [this channel](https://thingspeak.com/channels/1092202).
 * After 8hr the manual override is disabled automatically.
