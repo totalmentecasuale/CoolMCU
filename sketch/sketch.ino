@@ -2,7 +2,7 @@
 
 #include <ESP8266WiFi.h>;
 
-#include <WiFiClient.h>; 
+#include <WiFiClient.h>;
 
 #include <ThingSpeak.h>; // self-explanatory
 
@@ -15,8 +15,10 @@
 #include <ir_Panasonic.h>
 
 // Network variables
-const char* ssid = "foo"; //Your Network SSID
-const char* password = "bar"; //Your Network Password
+const char* ssid = "belìn è la rrrete"; //Your Network SSID
+//const char* ssid = "wifimcu"; //Your Network SSID
+const char* password = "11235813213455"; //Your Network Password
+//const char* password = "zoccazocca"; //Your Network Password
 
 const char* mqtt_server = "test.mosquitto.org";
 
@@ -31,13 +33,12 @@ IRPanasonicAc ac(kIrLed);  // Set the GPIO used for sending messages.
 // MQTT setup
 WiFiClient espclient;
 PubSubClient client(espclient);
+
 long lastMsg = 0;
 long lastTsMsg = 0;
-long lastACMsg = 0;
 char msg_t[50];
 char msg_h[50];
 char ACmsg[100];
-int value = 0;
 
 // Thingspeak channel setup
 unsigned long myChannelNumber = 1092202; //Your Channel Number (Without Brackets)
@@ -45,6 +46,7 @@ unsigned long myChannelNumber = 1092202; //Your Channel Number (Without Brackets
 const char * myWriteAPIKey = "WRVX1WEF8WHP5M1W"; //Your Write API Key
 
 bool manual_or = false;
+bool state_changed = false;
 
 // Functions-------------------------------------------
 
@@ -69,21 +71,14 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
 
-  // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
-    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
-    // but actually the LED is on; this is because
-    // it is acive low on the ESP-01)
-  } else {
-    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
-  }
-
   if((strcmp(topic, "room/AC/toggle")==0)){
     manual_or = true;
     if ((char)payload[0] == '1'){
        OnAC();
+       state_changed = true;
       } else if ((char)payload[0] == '0'){
        OffAC();
+       state_changed = true;
       }
     }
 
@@ -94,13 +89,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
     temperature = constrain(temperature, kPanasonicAcMinTemp, kPanasonicAcMaxTemp);
     Serial.print("Setting temp\n");
     ac.setTemp(temperature);
+    state_changed = true;
     }
 
   if((strcmp(topic, "room/AC/set_powerful")==0)){
     if ((char)payload[0] == '1'){
        ac.setPowerful(true);
+       state_changed = true;
       } else if ((char)payload[0] == '0'){
        ac.setPowerful(false);
+       state_changed = true;
       }
     }
 
@@ -119,10 +117,20 @@ void callback(char* topic, byte* payload, unsigned int length) {
           ac.setMode(kPanasonicAcDry);
           break;
         }
+        state_changed = true;
       }
     if((strcmp(topic, "room/AC/reset_AC")==0)){
         resetAC();
+        state_changed = true;
       }
+    if((strcmp(topic, "room/AC/manual_or")==0)){
+        if ((char)payload[0] == '1'){
+          manual_or = true;
+        } else if ((char)payload[0] == '0'){
+          manual_or = false;
+        }
+      }
+
 
 }
 
@@ -232,16 +240,20 @@ void loop()
   }
   client.loop();
 
-  #if SEND_PANASONIC_AC
-  Serial.println("Sending IR command to A/C ...");
-  ac.send();
+// Sending a command only if a change was added
+if(state_changed){
+    #if SEND_PANASONIC_AC
+    Serial.println("Sending IR command to A/C ...");
+    ac.send();
+    #endif  // SEND_PANASONIC_AC
+
+    state_changed = false;
+  }
   printState();
-  #endif  // SEND_PANASONIC_AC
 
   long now = millis();
   if (now - lastMsg > 2000) {
     lastMsg = now;
-    ++value;
     snprintf (msg_t, 50, "%.2f", tempC);
     snprintf (msg_h, 50, "%.2f", humidity);
     Serial.print("Publish message, Temp: ");
@@ -250,15 +262,13 @@ void loop()
     Serial.println(msg_h);
     client.publish("room/temp", msg_t);
     client.publish("room/hum", msg_h);
+    // Publish current remote status
+    client.publish("room/AC/status", ACmsg);
   }
   if(now - lastTsMsg > 30000){
     lastTsMsg = now;
     ThingSpeak.writeField(myChannelNumber, 1,tempC, myWriteAPIKey); //Update temperature in ThingSpeak
   }
 
-  if(now - lastACMsg > ‪28800000‬){
-    lastACMsg = now;
-    manual_or = false; // Reset manual override after a while (8hr)
-    }
-  delay(3000);
+  delay(5000);
 }
