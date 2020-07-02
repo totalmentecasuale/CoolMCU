@@ -19,6 +19,7 @@ Use a ESP8266 WiFi board to:
 * DHT11 (or any temperature and humidity sensor)
 * 2N2222 Transistor
 * IR LED
+* 330 Ohm resistor
 * microUSB cable
 
 ## Software
@@ -60,6 +61,7 @@ It repeats every 3 seconds.
 * Publish (from the mote point of view)
   * `/room/temp`, Temperature values
   * `/room/hum`, Humidity values
+  * `/room/AC/status`, Current AC remote setup
 
 
 * Subscribe
