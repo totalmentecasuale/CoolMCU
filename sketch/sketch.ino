@@ -1,9 +1,9 @@
 #include <DHT.h> // Temperature and humidity sensor library
 
 #include <ESP8266WiFi.h>;
- 
+
 #include <WiFiClient.h>; 
- 
+
 #include <ThingSpeak.h>; // self-explanatory
 
 #include <PubSubClient.h> // MQTT
@@ -15,10 +15,8 @@
 #include <ir_Panasonic.h>
 
 // Network variables
-const char* ssid = "belìn è la rrrete"; //Your Network SSID
-//const char* ssid = "wifimcu"; //Your Network SSID
-const char* password = "11235813213455"; //Your Network Password
-//const char* password = "zoccazocca"; //Your Network Password
+const char* ssid = "foo"; //Your Network SSID
+const char* password = "bar"; //Your Network Password
 
 const char* mqtt_server = "test.mosquitto.org";
 
@@ -43,7 +41,7 @@ int value = 0;
 
 // Thingspeak channel setup
 unsigned long myChannelNumber = 1092202; //Your Channel Number (Without Brackets)
- 
+
 const char * myWriteAPIKey = "WRVX1WEF8WHP5M1W"; //Your Write API Key
 
 bool manual_or = false;
@@ -60,7 +58,7 @@ void OffAC(){
   ac.off();
   ac.send();
   }
-  
+
 // Called when a message is received, currently testing
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
@@ -125,7 +123,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if((strcmp(topic, "room/AC/reset_AC")==0)){
         resetAC();
       }
-      
+
 }
 
 // Reconnecting to MQTT broker
@@ -142,7 +140,6 @@ void reconnect() {
       // Once connected, publish an announcement...
       client.publish("announcements", "hello world");
       // ... and resubscribe
-      client.subscribe("fromFabioTesting");
       client.subscribe("room/AC/toggle");
       client.subscribe("room/AC/set_temp");
       client.subscribe("room/AC/set_powerful");
@@ -220,7 +217,7 @@ void loop()
    // Reading Temperature and Humidity
   float tempC = DHT.readTemperature();
   float humidity = DHT.readHumidity();
-  
+
   Serial.print("Temperature (C) = ");
   Serial.println(tempC);
   Serial.print("Humidity = ");
@@ -240,7 +237,7 @@ void loop()
   ac.send();
   printState();
   #endif  // SEND_PANASONIC_AC
-    
+
   long now = millis();
   if (now - lastMsg > 2000) {
     lastMsg = now;
