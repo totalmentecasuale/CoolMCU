@@ -25,7 +25,7 @@ Use a ESP8266 WiFi board to:
 
 * Arduino IDE
 * The .ino sketch in this repo
-* MQTT client
+* MQTT client, I used [MQTT Dash](https://play.google.com/store/apps/details?id=net.routix.mqttdash&hl=en_US) for Android
 
 ## Build
 ![](report/pinout.png)
@@ -48,9 +48,10 @@ All the services are initialised:
 * AC, to control the air conditioning unit
 
 ### loop()
-It repeats every ... seconds.
+It repeats every 3 seconds.
 * Temperature and humidity are read and printed to serial port at the beginning of each cycle
 * The node checks if the temperature is above 24 and turns the AC on using the dedicated function. There is a manual override boolean in order to allow me to turn it on or off remotely.
+* If any message from the control topics has arrived the node sends the command to the AC unit via the IR LED.
 * If 2s have passed from the last MQTT messages published, a new one for each value is crafted and published to the channels `/room/temp` and `room/hum` respectively.
 * If 30s have passed from the last Thingspeak message (to avoid getting them rejected for being too frequent) another one is sent to [this channel](https://thingspeak.com/channels/1092202).
 * After 8hr the manual override is disabled automatically.
@@ -66,8 +67,15 @@ It repeats every ... seconds.
   * `room/AC/set_temp`, setting the temperature (number)
   * `room/AC/set_powerful`, toggling the powerful mode (1 or 0)
   * `room/AC/set_mode`, Heat (`h`), Cool (`c`), Dry (`d`), Auto (`a`) mode
+  * `room/AC/room/AC/manual_or`, toggling the manual override (1 or 0)
+
 
 Between parenthesis there are the payloads the node is able to recognise and convert into a IR remote command for the AC unit.
+
+## Dashboard
+The dashboard on MQTT Dash allows me to monitor the temperature and control the AC unit remotely.
+
+![](report/mqtt_dash.jpg)
 
 ## Dependencies
 * Sensor:
