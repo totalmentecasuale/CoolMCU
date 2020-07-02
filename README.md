@@ -72,6 +72,7 @@ It repeats approximately every 5 seconds.
   * `/room/temp`, Temperature values
   * `/room/hum`, Humidity values
   * `/room/AC/status`, Current AC remote setup
+  * `announcements`, Debug
 
 
 * Subscribe
@@ -80,6 +81,7 @@ It repeats approximately every 5 seconds.
   * `room/AC/set_powerful`, toggling the powerful mode (1 or 0)
   * `room/AC/set_mode`, Heat (`h`), Cool (`c`), Dry (`d`), Auto (`a`) mode
   * `room/AC/room/AC/manual_or`, toggling the manual override (1 or 0)
+  * `room/AC/reset_AC`, reset the remote to the default setting
 
 
 Between parenthesis there are the payloads the node is able to recognise and convert into a IR remote command for the AC unit.
