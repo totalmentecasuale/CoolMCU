@@ -10,7 +10,7 @@ In this video the remote control features are displayed, together with the log s
 
 ## Project concept
 
-The goal was creating a simple sensing and actuating mote that allows me to remotely control the AC unit (so that my room is already at a livable temperature when I get home) and apply to something tangible the skills learned during the course. 
+The goal was creating a simple sensing and actuating mote that allows me to remotely control the AC unit (so that my room is already at a livable temperature when I get home) and apply to something tangible the skills learned during the course.
 
 An ESP8266 WiFi board was used to:
 
@@ -35,7 +35,8 @@ An ESP8266 WiFi board was used to:
 
 * Arduino IDE, [some setup](https://www.instructables.com/id/Setting-Up-the-Arduino-IDE-to-Program-the-ESP8266-/) is needed in order for the board to work with it
 * The .ino sketch in this repo
-* MQTT client, I used [MQTT Dash](https://play.google.com/store/apps/details?id=net.routix.mqttdash&hl=en_US) for Android
+* MQTT client, I used [MQTT Dash](https://play.google.com/store/apps/details?id=net.routix.mqttdash&hl=en_US) for Android.
+* MQTT broker used in this project: `test.mosquitto.org`
 
 ## Build
 ![](report/pinout.png)
